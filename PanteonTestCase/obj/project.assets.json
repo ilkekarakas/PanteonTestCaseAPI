@@ -2741,19 +2741,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {}
+    "C:\\Users\\ismai\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Documents\\GitHub\\PanteonTestCase\\PanteonTestCase\\PanteonTestCase.csproj",
+      "projectUniqueName": "C:\\Users\\ismai\\Desktop\\Panteon\\PanteonTestCaseAPI\\PanteonTestCase\\PanteonTestCase.csproj",
       "projectName": "PanteonTestCase",
-      "projectPath": "C:\\Users\\user\\Documents\\GitHub\\PanteonTestCase\\PanteonTestCase\\PanteonTestCase.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Documents\\GitHub\\PanteonTestCase\\PanteonTestCase\\obj\\",
+      "projectPath": "C:\\Users\\ismai\\Desktop\\Panteon\\PanteonTestCaseAPI\\PanteonTestCase\\PanteonTestCase.csproj",
+      "packagesPath": "C:\\Users\\ismai\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ismai\\Desktop\\Panteon\\PanteonTestCaseAPI\\PanteonTestCase\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ismai\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2843,7 +2843,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   }

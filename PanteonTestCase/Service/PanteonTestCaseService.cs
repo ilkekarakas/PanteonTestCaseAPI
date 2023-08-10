@@ -65,7 +65,6 @@ namespace PanteonTestCase.Service
         }
         public async Task<ServiceResult<UserResponseDto>> Login(LoginRequestDto model)
         {
-
             var userRepo = PanteonTestCaseContext.Users.ToList();
             string SHAPassword = SHA1Password(model.Password);
 
@@ -96,22 +95,19 @@ namespace PanteonTestCase.Service
             {
                 return new ServiceResult<BuildingConfiguration>(null, "Building Cost cannot be 0 or less than 0.", ResultType.Warning);
             }
-            if (model.ConstructionTime <= 29)
+            if (model.ConstructionTime <= 29 || model.ConstructionTime >= 1801)
             {
-                return new ServiceResult<BuildingConfiguration>(null, "Construction Time cannot be less than 30.", ResultType.Warning);
-            }
-            if (model.ConstructionTime >= 1801)
-            {
-                return new ServiceResult<BuildingConfiguration>(null, "Construction Time cannot be greater than 1800.", ResultType.Warning);
+                return new ServiceResult<BuildingConfiguration>(null, "Construction Time cannot be less than 30 or bigger than 1800.", ResultType.Warning);
             }
 
-            var connectionString = "mongodb://localhost:27017/BuildingConfiguration";
+            var connectionString = "mongodb://localhost:27017/BuildingConfiguration";// panteon-db veritabanının Building Configuration tablosuna bağlanmak için yazılan kod
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("panteon-db");
             var _collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
 
             if (!string.IsNullOrEmpty(model.Id))
             {
+                //update
                 var update = Builders<BuildingConfiguration>.Update
                          .Set(config => config.BuildingCost, model.BuildingCost)
                          .Set(config => config.BuildingType, model.BuildingType)
@@ -121,6 +117,7 @@ namespace PanteonTestCase.Service
             }
             else
             {
+                //add
                 var filter = Builders<BuildingConfiguration>.Filter.Eq(x => x.BuildingType, model.BuildingType);
                 var result = await _collection.Find(filter).ToListAsync();
                 if (result.Count() > 0)
@@ -144,31 +141,23 @@ namespace PanteonTestCase.Service
 
         public async Task<ServiceResult<List<BuildingConfigurationDto>>> GetBuildingConfigurationList()
         {
-            try
-            {
-                var connectionString = "mongodb://localhost:27017";
-                var client = new MongoClient(connectionString);
-                var database = client.GetDatabase("panteon-db");
-                var collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
+            var connectionString = "mongodb://localhost:27017";
+            var client = new MongoClient(connectionString);
+            var database = client.GetDatabase("panteon-db");
+            var collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
 
-                // Tüm belgeleri çekme
-                var allDocuments = await collection
-                    .Find(_ => true)
-                    .ToListAsync();
+            // Tüm verileri çekme
+            var allBuildingConfiguration = await collection
+                .Find(_ => true)
+                .ToListAsync();
 
-                return new ServiceResult<List<BuildingConfigurationDto>>(allDocuments.Select(x => new BuildingConfigurationDto
-                {
-                    BuildingCost = x.BuildingCost,
-                    Id = x.Id.ToString(),
-                    BuildingType = x.BuildingType,
-                    ConstructionTime = x.ConstructionTime
-                }).ToList(), "Transaction Successful.", ResultType.Success);
-            }
-            catch (Exception ex)
+            return new ServiceResult<List<BuildingConfigurationDto>>(allBuildingConfiguration.Select(x => new BuildingConfigurationDto
             {
-                // Hata yönetimi burada yapılabilir.
-                return new ServiceResult<List<BuildingConfigurationDto>>(null, ex.Message, ResultType.Error);
-            }
+                BuildingCost = x.BuildingCost,
+                Id = x.Id.ToString(),
+                BuildingType = x.BuildingType,
+                ConstructionTime = x.ConstructionTime
+            }).ToList(), "Transaction Successful.", ResultType.Success);
         }
         public async Task<ServiceResult<List<BuildingTypesDto>>> GetBuildingTypes()
         {
@@ -178,12 +167,10 @@ namespace PanteonTestCase.Service
             var database = client.GetDatabase("panteon-db");
             var collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
 
+            var enumValues = Enum.GetValues(typeof(BuildingTypes)).Cast<BuildingTypes>().ToList();
+            var comboBoxDataList = new List<BuildingTypesDto>();
 
             var buildingConfigs = await collection.Find(_ => true).ToListAsync();
-
-            var enumValues = Enum.GetValues(typeof(BuildingTypes)).Cast<BuildingTypes>().ToList();
-
-            var comboBoxDataList = new List<BuildingTypesDto>();
 
             foreach (var enumValue in enumValues)
             {
@@ -212,7 +199,8 @@ namespace PanteonTestCase.Service
 
             return isValid;
         }
-        static string GetEnumDisplayValue(BuildingTypes enumValue)
+
+        public static string GetEnumDisplayValue(Enum enumValue)
         {
             var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
 
@@ -222,12 +210,14 @@ namespace PanteonTestCase.Service
 
                 if (attributes.Length > 0 && attributes[0] is DisplayAttribute displayAttribute)
                 {
+                    // DisplayAttribute'in "Name" özelliği döndürülür (enum değeri için görsel adı).
                     return displayAttribute.Name;
                 }
             }
 
             return enumValue.ToString();
         }
+
 
         public static string SHA1Password(string text)
         {

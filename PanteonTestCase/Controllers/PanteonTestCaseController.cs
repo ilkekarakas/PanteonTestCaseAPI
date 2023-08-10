@@ -16,12 +16,6 @@ namespace PanteonTestCase.Controllers
     {
         PanteonTestCaseService _PanteonTestCaseService = new PanteonTestCaseService();
 
-        private readonly IConfiguration _configuration;
-
-        public PanteonTestCaseController(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
         #region Register Login
         [HttpPost("Register")]
         public async Task<ServiceResult> Register([FromBody] UserRequestDto model)
@@ -38,18 +32,20 @@ namespace PanteonTestCase.Controllers
 
         #region Building Configuration
         [HttpPost("AddOrUpdateBuildingConfiguration")]
+        [Authorize]
         public async Task<ServiceResult> AddOrUpdateBuildingConfiguration([FromBody] BuildingConfigurationDto model)
         {
             return await _PanteonTestCaseService.AddOrUpdateBuildingConfiguration(model);
         }
 
         [HttpGet("GetBuildingConfigurationList")]
+        [Authorize]
         public async Task<ServiceResult<List<BuildingConfigurationDto>>> GetBuildingConfigurationList()
         {
             return await _PanteonTestCaseService.GetBuildingConfigurationList();
         }      
-        
         [HttpGet("GetBuildingTypes")]
+        [Authorize]
         public async Task<ServiceResult<List<BuildingTypesDto>>> GetBuildingTypes()
         {
             return await _PanteonTestCaseService.GetBuildingTypes();
