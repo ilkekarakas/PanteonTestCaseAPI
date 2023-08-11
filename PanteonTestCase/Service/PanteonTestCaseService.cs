@@ -17,10 +17,26 @@ namespace PanteonTestCase.Service
 {
     public class PanteonTestCaseService
     {
-        PanteonTestCaseContext PanteonTestCaseContext = new PanteonTestCaseContext();
         private readonly IConfiguration _configuration;
+        PanteonTestCaseContext PanteonTestCaseContext = new PanteonTestCaseContext();
+        public PanteonTestCaseService() : base()
+        {
 
+#if DEBUG
+            IConfiguration Configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+            _configuration = Configuration;
+#else
+            IConfiguration Configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.Development.json")
+               .Build();
+            _configuration = Configuration;
+#endif
 
+        }
         #region Register Login
         public async Task<ServiceResult> Register(UserRequestDto model)
         {
@@ -100,7 +116,7 @@ namespace PanteonTestCase.Service
                 return new ServiceResult<BuildingConfiguration>(null, "Construction Time cannot be less than 30 or bigger than 1800.", ResultType.Warning);
             }
 
-            var connectionString = "mongodb://localhost:27017/BuildingConfiguration";// panteon-db veritabanının Building Configuration tablosuna bağlanmak için yazılan kod
+            var connectionString = _configuration.GetSection("MongoDbConnectionString").Value;
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("panteon-db");
             var _collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
@@ -141,7 +157,7 @@ namespace PanteonTestCase.Service
 
         public async Task<ServiceResult<List<BuildingConfigurationDto>>> GetBuildingConfigurationList()
         {
-            var connectionString = "mongodb://localhost:27017";
+            var connectionString = _configuration.GetSection("MongoDbConnectionString").Value;
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("panteon-db");
             var collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
@@ -162,7 +178,8 @@ namespace PanteonTestCase.Service
         public async Task<ServiceResult<List<BuildingTypesDto>>> GetBuildingTypes()
         {
             var data = new BuildingTypesDto();
-            var connectionString = "mongodb://localhost:27017";
+            var connectionString = _configuration.GetSection("MongoDbConnectionString").Value;
+
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("panteon-db");
             var collection = database.GetCollection<BuildingConfiguration>("BuildingConfiguration");
